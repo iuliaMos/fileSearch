@@ -25,6 +25,11 @@ public class FileSearchHandler {
                 int index = line.toLowerCase().indexOf(this.keyString);
                 if (index >= 0) {
                     writeToFile(fw, line.substring(index + length));
+                } else {
+                    String text = line.trim();
+                    if (text.matches("[0-9]+") && text.length() > 3) {
+                        writeToFile(fw, line);
+                    }
                 }
                 this.lineNr++;
             }
