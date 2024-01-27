@@ -7,27 +7,46 @@ import java.util.Optional;
 public class FileSearchHandler {
 
     private final String selectedFilePath;
-    private final String keyString;
+    private final String keyBeginning;
+    private final String keyInside;
+    private final String keyEnd;
     private int lineNr = 0;
 
-    public FileSearchHandler(String selectedFilePath, String text) {
+    public FileSearchHandler(String selectedFilePath, String keyBeginning, String keyInside, String keyEnd) {
         this.selectedFilePath = selectedFilePath;
-        this.keyString = Optional.ofNullable(text).map(String::toLowerCase).orElse("-");
+        this.keyBeginning = Optional.ofNullable(keyBeginning).map(String::toLowerCase).orElse(null);
+        this.keyInside = Optional.ofNullable(keyInside).map(String::toLowerCase).orElse(null);
+        this.keyEnd = Optional.ofNullable(keyEnd).map(String::toLowerCase).orElse(null);
     }
 
     public void doSearchAndReturn() {
         File outFile = getValidFile();
-        int length = this.keyString.length();
         try (BufferedReader br = new BufferedReader(new FileReader(this.selectedFilePath));
              FileWriter fw = new FileWriter(outFile)) {
             String line;
             while ((line = br.readLine()) != null) {
-                int index = line.toLowerCase().indexOf(this.keyString);
-                if (index >= 0) {
-                    writeToFile(fw, line.substring(index + length));
-                } else {
-                    String text = line.trim();
-                    if (text.matches("[0-9]+") && text.length() > 3) {
+                String lineLowerCase = line.toLowerCase().trim();
+
+                if (lineLowerCase.matches("[0-9]+") && lineLowerCase.length() > 3) {
+                    writeToFile(fw, line);
+                    continue;
+                }
+
+                if (this.keyBeginning != null) {
+                    boolean key1IsFound = lineLowerCase.startsWith(keyBeginning);
+                    if (key1IsFound) {
+                        writeToFile(fw, line.substring(keyBeginning.length()));
+                    }
+                }
+                if (this.keyInside != null) {
+                    int indexKey2 = lineLowerCase.indexOf(keyInside);
+                    if (indexKey2 >= 0) {
+                        writeToFile(fw, line);
+                    }
+                }
+                if (this.keyEnd != null) {
+                    boolean key3IsFound = lineLowerCase.endsWith(keyEnd);
+                    if (key3IsFound) {
                         writeToFile(fw, line);
                     }
                 }
