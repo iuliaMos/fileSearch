@@ -35,7 +35,7 @@ public class FileSearchHandler {
                 if (this.keyBeginning != null) {
                     boolean key1IsFound = lineLowerCase.startsWith(keyBeginning);
                     if (key1IsFound) {
-                        writeToFile(fw, line.substring(keyBeginning.length()));
+                        writeToFile(fw, line.trim().substring(keyBeginning.length()));
                     }
                 }
                 if (this.keyInside != null) {
